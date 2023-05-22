@@ -20,11 +20,6 @@ export default class Chat extends Model {
   })
   id: number;
 
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    defaultValue: [],
-  })
   @BelongsTo(() => User)
   members: User[];
 

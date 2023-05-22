@@ -11,10 +11,6 @@ export default class Message extends Model {
   })
   id: number;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
   content: string;
 
   @BelongsTo(() => Chat)

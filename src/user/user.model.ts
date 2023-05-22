@@ -18,10 +18,6 @@ export class User extends Model {
   })
   username: string;
 
-  @Column({
-    defaultValue: [],
-    allowNull: false,
-  })
   @HasMany(() => Chat)
   chats: Chat[];
 }
