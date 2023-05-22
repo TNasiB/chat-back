@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { UserModule } from './user/user.module';
+import { ChatModule } from './chat/chat.module';
+import { MessageModule } from './message/message.module';
 
 const dataBaseInstance = SequelizeModule.forRoot({
   dialect: 'postgres',
@@ -15,7 +18,7 @@ const dataBaseInstance = SequelizeModule.forRoot({
 });
 
 @Module({
-  imports: [dataBaseInstance],
+  imports: [dataBaseInstance, UserModule, ChatModule, MessageModule],
   controllers: [AppController],
   providers: [AppService],
 })
