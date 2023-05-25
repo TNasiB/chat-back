@@ -3,8 +3,8 @@ import {
   Table,
   Column,
   DataType,
-  BelongsTo,
   HasMany,
+  ForeignKey,
 } from 'sequelize-typescript';
 import Message from 'src/message/message.model';
 import { User } from 'src/user/user.model';
@@ -20,9 +20,9 @@ export default class Chat extends Model {
   })
   id: number;
 
-  @BelongsTo(() => User)
-  members: User[];
+  @ForeignKey(() => User)
+  members: number[];
 
   @HasMany(() => Message)
-  messages: Message[];
+  messages: number[];
 }

@@ -1,6 +1,13 @@
-import { BelongsTo, Column, DataType, Model } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  Model,
+  ForeignKey,
+  Table,
+} from 'sequelize-typescript';
 import Chat from 'src/chat/chat.model';
 
+@Table
 export default class Message extends Model {
   @Column({
     type: DataType.INTEGER,
@@ -13,6 +20,6 @@ export default class Message extends Model {
 
   content: string;
 
-  @BelongsTo(() => Chat)
-  chatId: Chat;
+  @ForeignKey(() => Chat)
+  chatId: number;
 }
