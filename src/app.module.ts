@@ -13,6 +13,7 @@ import { User } from './user/user.model';
 import Chat from './chat/chat.model';
 import Message from './message/message.model';
 import { JwtModule } from '@nestjs/jwt';
+import { UserChat } from './chat/user-chat.model';
 
 const dataBaseInstance = SequelizeModule.forRoot({
   dialect: 'postgres',
@@ -20,9 +21,9 @@ const dataBaseInstance = SequelizeModule.forRoot({
   port: 5432,
   username: 'timerannasibullin',
   password: 'root',
-  database: 'chat',
+  database: 'chat2',
   autoLoadModels: true,
-  models: [User, Chat, Message],
+  models: [User, Chat, Message, UserChat],
 });
 
 const configModule = ConfigModule.forRoot({ load: [configuration] });

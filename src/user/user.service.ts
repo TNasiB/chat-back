@@ -1,37 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.model';
 import { InjectModel } from '@nestjs/sequelize';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User) private userRepository: typeof User) {}
-
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
+  constructor(
+    @InjectModel(User) private userRepository: typeof User,
+    private jwtService: JwtService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const newUser = await this.userRepository.create(createUserDto);
     return newUser;
-  }
-
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
   }
 
   async findByUsername(username: string) {
@@ -44,11 +26,9 @@ export class UserService {
     return matchedUser;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async findByToken(token: string) {
+    const user: any = this.jwtService.decode(token);
+    const userFinded = this.findByUsername(user.username);
+    return userFinded;
   }
 }

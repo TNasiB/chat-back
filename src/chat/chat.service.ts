@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
-import { UpdateChatDto } from './dto/update-chat.dto';
+import { UserService } from 'src/user/user.service';
+import Chat from './chat.model';
+import { InjectModel } from '@nestjs/sequelize';
+import { User } from 'src/user/user.model';
+import { UserChat } from './user-chat.model';
 
 @Injectable()
 export class ChatService {
-  create(createChatDto: CreateChatDto) {
-    return 'This action adds a new chat';
-  }
+  constructor(
+    private userService: UserService,
+    @InjectModel(Chat) private chatRepository: typeof Chat,
+    @InjectModel(User) private userRepository: typeof User,
+    @InjectModel(UserChat) private userChatRepository: typeof UserChat,
+  ) {}
 
-  findAll() {
-    return `This action returns all chat`;
-  }
+  async createChat(createChatDto: CreateChatDto & { owner_token: string }) {
+    const user = await this.userService.findByToken(createChatDto.owner_token);
 
-  findOne(id: number) {
-    return `This action returns a #${id} chat`;
-  }
+    const interlocutor = await this.userRepository.findByPk(
+      createChatDto.interlocutor,
+    );
 
-  update(id: number, updateChatDto: UpdateChatDto) {
-    return `This action updates a #${id} chat`;
-  }
+    const newChat = await this.chatRepository.create();
 
-  remove(id: number) {
-    return `This action removes a #${id} chat`;
+    await this.userChatRepository.create({
+      userId: user.id,
+      chatId: newChat.id,
+    });
+
+    await this.userChatRepository.create({
+      userId: interlocutor.id,
+      chatId: newChat.id,
+    });
+
+    return newChat;
   }
 }

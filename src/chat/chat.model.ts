@@ -4,10 +4,11 @@ import {
   Column,
   DataType,
   HasMany,
-  ForeignKey,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import Message from 'src/message/message.model';
 import { User } from 'src/user/user.model';
+import { UserChat } from './user-chat.model';
 
 @Table
 export default class Chat extends Model {
@@ -20,9 +21,9 @@ export default class Chat extends Model {
   })
   id: number;
 
-  @ForeignKey(() => User)
-  members: number[];
+  @BelongsToMany(() => User, () => UserChat)
+  members: User[];
 
   @HasMany(() => Message)
-  messages: number[];
+  messages: Message[];
 }
