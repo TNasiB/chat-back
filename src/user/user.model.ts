@@ -1,5 +1,13 @@
-import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  HasMany,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import Chat from '../chat/chat.model';
+import { UserChat } from 'src/chat/user-chat.model';
 
 @Table
 export class User extends Model<User> {
@@ -24,6 +32,6 @@ export class User extends Model<User> {
   })
   password: string;
 
-  @HasMany(() => Chat)
-  chats: Chat[];
+  @BelongsToMany(() => Chat, () => UserChat)
+  chats: Array<Chat & { UserChat: UserChat }>;
 }

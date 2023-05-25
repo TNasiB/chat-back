@@ -18,6 +18,7 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post('sign-up')
   signUp(@Body() signUpDto: SignUpDto) {
+    console.log(1);
     this.authService.signUp(signUpDto);
   }
 
