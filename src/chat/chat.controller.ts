@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post, Request } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Request, Get } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -21,5 +21,15 @@ export class ChatController {
     });
 
     return newChat;
+  }
+
+  @HttpCode(200)
+  @Get()
+  getByUser(@Request() request) {
+    const token = this.authGuard.extractTokenFromHeader(request);
+
+    const chats = this.chatService.getByUser(token);
+
+    return chats;
   }
 }
