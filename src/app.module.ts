@@ -14,6 +14,8 @@ import Chat from './chat/chat.model';
 import Message from './message/message.model';
 import { JwtModule } from '@nestjs/jwt';
 import { UserChat } from './chat/user-chat.model';
+import { WebsocketModule } from './websocket/websocket.module';
+import { WebsocketGateway } from './websocket/websocket.gateway';
 
 const dataBaseInstance = SequelizeModule.forRoot({
   dialect: 'postgres',
@@ -43,8 +45,9 @@ const jwtModule = JwtModule.register({
     MessageModule,
     AuthModule,
     jwtModule,
+    WebsocketModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService],
+  providers: [AppService, AuthService, WebsocketGateway],
 })
 export class AppModule {}
