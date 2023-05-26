@@ -36,4 +36,13 @@ export class ChatService {
 
     return newChat;
   }
+
+  async getByUser(token: string) {
+    const user = await this.userService.findByToken(token);
+    const userChats = await this.userChatRepository.findAll({
+      where: { userId: user.id },
+    });
+    const chatIds = userChats.map((userChat) => userChat.chatId);
+    return chatIds;
+  }
 }
