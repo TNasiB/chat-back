@@ -15,32 +15,20 @@ import { Request as RequestType } from 'express';
 
 @Controller('chat')
 export class ChatController {
-  constructor(
-    private readonly chatService: ChatService,
-    private authGuard: AuthGuard,
-  ) {}
+  constructor(private readonly chatService: ChatService) {}
 
+  @UseGuards(AuthGuard)
   @HttpCode(201)
   @Post('create')
   createChat(@Body() chat: CreateChatDto, @Request() request: RequestType) {
-    const token = this.authGuard.extractTokenFromHeader(request);
+    const userSenderId = (request.user as { sub: number }).sub;
 
     const newChat = this.chatService.createChat({
-      owner_token: token,
+      userId: userSenderId,
       ...chat,
     });
 
     return newChat;
-  }
-
-  @HttpCode(200)
-  @Get()
-  getByUser(@Request() request: RequestType) {
-    const token = this.authGuard.extractTokenFromHeader(request);
-
-    const chats = this.chatService.getByUser(token);
-
-    return chats;
   }
 
   @UseGuards(AuthGuard)

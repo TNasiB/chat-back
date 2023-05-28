@@ -6,10 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel(User) private userRepository: typeof User,
-    private jwtService: JwtService,
-  ) {}
+  constructor(@InjectModel(User) private userRepository: typeof User) {}
 
   async create(createUserDto: CreateUserDto) {
     const newUser = await this.userRepository.create(createUserDto);
@@ -24,11 +21,5 @@ export class UserService {
     });
 
     return matchedUser;
-  }
-
-  async findByToken(token: string) {
-    const user: any = this.jwtService.decode(token);
-    const userFinded = this.findByUsername(user.username);
-    return userFinded;
   }
 }

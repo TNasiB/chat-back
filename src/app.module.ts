@@ -22,7 +22,7 @@ const dataBaseInstance = SequelizeModule.forRoot({
   port: 5432,
   username: 'timerannasibullin',
   password: 'root',
-  database: 'chat2',
+  database: 'chat3',
   autoLoadModels: true,
   models: [User, Chat, Message, UserChat],
 });

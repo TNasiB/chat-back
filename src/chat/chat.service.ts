@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UserService } from 'src/user/user.service';
 import Chat from './chat.model';
@@ -15,9 +15,7 @@ export class ChatService {
     @InjectModel(UserChat) private userChatRepository: typeof UserChat,
   ) {}
 
-  async createChat(createChatDto: CreateChatDto & { owner_token: string }) {
-    const user = await this.userService.findByToken(createChatDto.owner_token);
-
+  async createChat(createChatDto: CreateChatDto) {
     const interlocutor = await this.userRepository.findByPk(
       createChatDto.interlocutor,
     );
@@ -25,7 +23,7 @@ export class ChatService {
     const newChat = await this.chatRepository.create();
 
     await this.userChatRepository.create({
-      userId: user.id,
+      userId: createChatDto.userId,
       chatId: newChat.id,
     });
 
@@ -35,15 +33,6 @@ export class ChatService {
     });
 
     return newChat;
-  }
-
-  async getByUser(token: string) {
-    const user = await this.userService.findByToken(token);
-    const userChats = await this.userChatRepository.findAll({
-      where: { userId: user.id },
-    });
-    const chatIds = userChats.map((userChat) => userChat.chatId);
-    return chatIds;
   }
 
   async getChatByUser(userId: number, interlocutor: number) {
@@ -60,8 +49,8 @@ export class ChatService {
       ],
     });
 
-    if (chat) return chat;
+    if (!chat) throw new NotFoundException('Chat not found');
 
-    return null;
+    return chat;
   }
 }
