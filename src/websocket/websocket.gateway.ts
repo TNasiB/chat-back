@@ -1,41 +1,43 @@
 import {
-  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  OnGatewayInit,
   SubscribeMessage,
+  WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { WebSocketGateway } from '@nestjs/websockets';
 
-@WebSocketGateway(3001, { namespace: 'chat' })
-export class WebsocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
-  @SubscribeMessage('message')
-  onMessage(@MessageBody() message) {
-    console.log(message);
-  }
-
+@WebSocketGateway({
+  cors: { origin: ['http://localhost:5173'] },
+})
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  afterInit(server: Server) {
-    console.log('WebSocket server initialized');
+  counter: number;
+
+  private connectedClients: Set<string> = new Set();
+
+  @SubscribeMessage('join-chat')
+  handleJoinChat(client: Socket, room: string) {
+    client.join(room);
+  }
+
+  @SubscribeMessage('send-message')
+  handleSendMessage(client: Socket, message: string) {
+    console.log(message);
+    this.server.emit('message-receive', message);
   }
 
   handleConnection(client: Socket) {
-    console.log(`Client connected: ${client}`);
+    const queryParam = client.handshake.query?.userId;
+    const id = Array.isArray(queryParam) ? queryParam.at(-1) : queryParam;
+    this.connectedClients.add(id);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    this.connectedClients.delete(client.id);
   }
 
-  @SubscribeMessage('message')
-  handleMessage(client: Socket, payload: any) {
-    console.log(`Received message from client ${client.id}: ${payload}`);
-    // Дополнительная логика обработки сообщения
-  }
+  // sendChats() {}
 }

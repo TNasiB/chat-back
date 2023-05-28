@@ -45,4 +45,23 @@ export class ChatService {
     const chatIds = userChats.map((userChat) => userChat.chatId);
     return chatIds;
   }
+
+  async getChatByUser(userId: number, interlocutor: number) {
+    const chat = await Chat.findOne({
+      include: [
+        {
+          model: User,
+          where: { id: userId },
+        },
+        {
+          model: User,
+          where: { id: interlocutor },
+        },
+      ],
+    });
+
+    if (chat) return chat;
+
+    return null;
+  }
 }
