@@ -44,9 +44,8 @@ const jwtModule = JwtModule.register({
     ChatModule,
     MessageModule,
     AuthModule,
-    ChatGateway,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService],
+  providers: [AppService, AuthService, ChatGateway],
 })
 export class AppModule {}

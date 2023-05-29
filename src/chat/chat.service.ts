@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
-import { UserService } from 'src/user/user.service';
 import Chat from './chat.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/user/user.model';
@@ -9,7 +8,6 @@ import { UserChat } from './user-chat.model';
 @Injectable()
 export class ChatService {
   constructor(
-    private userService: UserService,
     @InjectModel(Chat) private chatRepository: typeof Chat,
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(UserChat) private userChatRepository: typeof UserChat,
