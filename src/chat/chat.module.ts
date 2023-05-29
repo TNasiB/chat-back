@@ -7,10 +7,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import Chat from './chat.model';
 import { User } from 'src/user/user.model';
 import { UserChat } from './user-chat.model';
+import { ChatGateway } from 'src/websocket/websocket.gateway';
 
 @Module({
   controllers: [ChatController],
-  providers: [ChatService],
+  providers: [ChatService, ChatGateway],
   imports: [
     AuthModule,
     UserModule,

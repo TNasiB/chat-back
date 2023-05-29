@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -18,7 +19,6 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post('sign-up')
   signUp(@Body() signUpDto: SignUpDto) {
-    console.log(1);
     this.authService.signUp(signUpDto);
   }
 
@@ -27,6 +27,7 @@ export class AuthController {
     return this.authService.signIn(signInDto);
   }
 
+  @Get('my-profile')
   @UseGuards(AuthGuard)
   getProfile(@Request() req) {
     return req.user;

@@ -1,35 +1,67 @@
-import { Body, Controller, HttpCode, Post, Request, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Request,
+  Get,
+  UseGuards,
+  Param,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Request as RequestType } from 'express';
+import { ChatGateway } from 'src/websocket/websocket.gateway';
 
 @Controller('chat')
 export class ChatController {
   constructor(
     private readonly chatService: ChatService,
-    private authGuard: AuthGuard,
+    private chatGateway: ChatGateway,
   ) {}
 
+  @UseGuards(AuthGuard)
   @HttpCode(201)
   @Post('create')
-  createChat(@Body() chat: CreateChatDto, @Request() request) {
-    const token = this.authGuard.extractTokenFromHeader(request);
+  async createChat(
+    @Body() chat: CreateChatDto,
+    @Request() request: RequestType,
+  ) {
+    const userSenderId = (request.user as { sub: number }).sub;
 
-    const newChat = this.chatService.createChat({
-      owner_token: token,
-      ...chat,
-    });
+    try {
+      const newChat = await this.chatService.createChat({
+        userId: userSenderId,
+        ...chat,
+      });
 
-    return newChat;
+      await this.chatGateway.createRoom({
+        userId: String(userSenderId),
+        interlocutor: String(chat.interlocutor),
+        chatId: newChat.id,
+      });
+
+      return newChat;
+    } catch {
+      return new InternalServerErrorException(
+        'Internal server error, cannot create chat and ws connection',
+      );
+    }
   }
 
-  @HttpCode(200)
-  @Get()
-  getByUser(@Request() request) {
-    const token = this.authGuard.extractTokenFromHeader(request);
-
-    const chats = this.chatService.getByUser(token);
-
-    return chats;
+  @UseGuards(AuthGuard)
+  @Get(':interlocutor')
+  async getChatByUser(
+    @Request() req: RequestType,
+    @Param('interlocutor') interlocutor,
+  ) {
+    const userSenderId = (req.user as { sub: number }).sub;
+    const chat = await this.chatService.getChatByUser(
+      userSenderId,
+      interlocutor,
+    );
+    return chat;
   }
 }
